@@ -6,18 +6,15 @@ Created on Mon May  4 15:41:08 2020
 @author: jireh.park
 """
 
-
 import pandas as pd
 import os
 from tqdm import tqdm
-
-os.chdir("/Users/jireh.park/jireh_module/appointment/")
 from appointment.appointment import *
 
 
 # 역번호 리스트 호출
-path = "/Users/jireh.park/Desktop/appointment/"
-sub_index = pd.read_csv(path + "sub_index.txt", 
+path = "../data/"
+sub_index = pd.read_csv(path + "sub_index.txt",
                         encoding = 'cp949', sep = '|', engine = 'python', dtype = str)
 
 # 핫플레이스 리스트 호출
@@ -31,7 +28,7 @@ hot4 = pd.read_csv(path + "sub_hot4.txt",
                    sep = '|', encoding = 'cp949', dtype = str)
 
 # route 데이터 호출
-path2 = "/Users/jireh.park/jireh_module/svc_data/route/"
+path2 = "data"
 route = pd.read_csv(path2 + "route.csv",
                     encoding = 'cp949')
 # 중복제거
@@ -41,7 +38,6 @@ s1 = '응암' ; s2 = '삼성';
 # 핫플레이스 역명 리스트
 base = basic(df = sub_index)
 place_list = base.code_to_name(hot4['역번호'].tolist())
-
 
 
 # 약속장소 산출
