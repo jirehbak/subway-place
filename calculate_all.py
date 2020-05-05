@@ -109,7 +109,7 @@ for pair in sub_pairs[index_st:]:
     start2 = pair[0]
     # destination2 = pair[1]
     
-all_route
+# all_route
 
 
 # all_route.to_csv("svc_data/all_route.txt",
