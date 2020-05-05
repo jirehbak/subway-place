@@ -14,11 +14,12 @@ import numpy as np
 from tqdm import tqdm
 from datetime import datetime
 
-
-
-os.chdir("/Users/jireh.park/jireh_module/appointment/")
 from appointment.data_cleansing import data_cleansing
 from appointment.appointment import *
+import datalab.storage as gcs
+
+def dataframe_to_gcs:(bucketname, path, dataframe):
+    gcs.Bucket(bucketname).item(path).write_to(dataframe.to_csv(),'text/csv')
 
 def get_pairs_from_list(lst):
     pairs = []
@@ -64,27 +65,34 @@ sub_pairs = get_pairs_from_list(sub_names)
 #             break
 #     R2.routes_to_destination(route_df, sub_list)
 #     route_list_a = R2.route_list
-        
+bucket_name = 'j-first-bucket'
+save_path = 'route/'
 st = datetime.now()
 all_route = pd.DataFrame()
 start2 = 0
 index_st = int(input("index 부터 계산시작: "))
+reverse = bool(input("reverse?: "))
 start_st = sub_pairs[index_st][0]
 ii = index_st
 
 for pair in sub_pairs[index_st:]:
-	
-    start = pair[0]
-    destination = pair[1]
-    
+	if reverse:
+        start = pair[1]
+        destination = pair[0]
+    else:
+        start = pair[0]
+        destination = pair[1]
+
     if start == start_st:
         continue
 
     if start != start2:
         if (len(all_route) > 0) & (start != start_st):
-            path = "/Users/jireh.park/jireh_module"
-            all_route.to_csv(path + "/svc_data/route_%d_%s.txt" %(ii, start2),
-                             encoding = 'cp949', sep = '|', index = False)
+            #path = "/Users/jireh.park/jireh_module"
+            #all_route.to_csv(path + "/svc_data/route_%d_%s.txt" %(ii, start2),
+            #                 encoding = 'cp949', sep = '|', index = False)
+            file_name = 'route_%d_%s_rev.txt' %(ii, start2)
+            dataframe_to_gcs(bucket_name, save_path + file_name, all_route)
         all_route = pd.DataFrame()
     
     print("%s\t%s\t\t%3.2f\t%s" %(start, destination, round(ii / len(sub_pairs) * 100, 2), str(datetime.now() - st)))
