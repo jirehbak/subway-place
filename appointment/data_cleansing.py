@@ -16,13 +16,13 @@ import re
 
 
 def data_cleansing():
-    os.chdir("/Users/jireh.park/Desktop/appointment")
-    sub_index = pd.read_csv("sub_index.txt", encoding = 'cp949', sep = '|', engine = 'python', dtype = str)
-    sub_dist = pd.read_csv("sub_dist.txt", encoding = 'cp949', sep = '|', engine = 'python', dtype = str)
+    path = 'data/'
+    sub_index = pd.read_csv(path + "sub_index.txt", encoding = 'cp949', sep = '|', engine = 'python', dtype = str)
+    sub_dist = pd.read_csv(path + "sub_dist.txt", encoding = 'cp949', sep = '|', engine = 'python', dtype = str)
     
-    sub_hot = pd.read_csv("sub_hot2.txt", encoding = 'cp949', sep = '|', engine = 'python', dtype = str)
-    sub_hot2 = pd.read_csv("sub_hot3.txt", encoding = 'cp949', sep = '|', engine = 'python', dtype = str)
-    sub_hot3 = pd.read_csv("sub_hot4.txt", encoding = 'cp949', sep = '|', engine = 'python', dtype = str)
+    sub_hot = pd.read_csv(path + "sub_hot2.txt", encoding = 'cp949', sep = '|', engine = 'python', dtype = str)
+    sub_hot2 = pd.read_csv(path + "sub_hot3.txt", encoding = 'cp949', sep = '|', engine = 'python', dtype = str)
+    sub_hot3 = pd.read_csv(path + "sub_hot4.txt", encoding = 'cp949', sep = '|', engine = 'python', dtype = str)
     
     sub_hot['역번호'] = sub_hot['역번호'].str.zfill(4)
     sub_hot2['역번호'] = sub_hot2['역번호'].str.zfill(4)
