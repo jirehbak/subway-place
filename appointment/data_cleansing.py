@@ -9,14 +9,15 @@ Created on Sun Apr 19 10:51:20 2020
 
 #% 데이터 불러오기
 import os
+import sys
 import pandas as pd
 import numpy as np
 import re
-
-
+sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 
 def data_cleansing():
-    path = 'data/'
+
+    path = '../data/'
     sub_index = pd.read_csv(path + "sub_index.txt", encoding = 'cp949', sep = '|', engine = 'python', dtype = str)
     sub_dist = pd.read_csv(path + "sub_dist.txt", encoding = 'cp949', sep = '|', engine = 'python', dtype = str)
     

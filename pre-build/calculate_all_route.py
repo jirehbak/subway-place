@@ -9,6 +9,10 @@ Created on Sun Apr 19 10:55:25 2020
 
 #% 데이터 불러오기
 import os
+import sys
+sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
+
+from io import StringIO
 import pandas as pd
 import numpy as np
 from tqdm import tqdm
@@ -17,11 +21,39 @@ from datetime import datetime
 from appointment.data_cleansing import data_cleansing
 from appointment.appointment import *
 import datalab.storage as gcs
+from datalab.context import Context
+from google.cloud import storage
 
-def dataframe_to_gcs:(bucketname, path, dataframe):
+os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = os.path.dirname(os.path.abspath(os.path.dirname(__file__)))+ '/key/level-district.json'
+
+def upload_blob(bucket_name, destination_blob_name, df):
+    global credentials
+    """Uploads a file to the bucket."""
+    # bucket_name = "your-bucket-name"
+    # source_file_name = "local/path/to/file"
+    # destination_blob_name = "storage-object-name"
+
+    storage_client = storage.Client()
+    bucket = storage_client.bucket(bucket_name)
+    blob = bucket.blob(destination_blob_name)
+
+    #f = StringIO()
+    df.to_csv("tmp", encoding = 'utf-8')
+    blob.upload_from_filename("tmp", content_type='text/csv')
+
+    # blob.upload_from_filename(source_file_name)
+
+    print(
+        "File uploaded to {}.".format(
+            destination_blob_name
+        )
+    )
+
+def dataframe_to_gcs(bucketname, path, dataframe):
+    global credentials
     gcs.Bucket(bucketname).item(path).write_to(dataframe.to_csv(),'text/csv')
 
-def get_pairs_from_list(lst):
+def get_unique_pairs_from_list(lst): # ab-ba 중복제거
     pairs = []
     lst_len = len(lst)
     for i in range(lst_len):
@@ -33,7 +65,22 @@ def get_pairs_from_list(lst):
             pairs.append((lst[i], item))
     
     return pairs
-    
+
+def get_pairs_from_list(lst):  # ab-ba 중복제거
+    pairs = []
+    lst_len = len(lst)
+    for i in range(lst_len):
+        if i == (lst_len - 1):
+            break
+
+        for item in lst:
+            if lst[i] != item:
+                pairs.append((lst[i], item))
+            else:
+                continue
+
+    return pairs
+
 sub_index, df = data_cleansing()
 sub_names = df.statnfnm.unique().tolist()
 sub_pairs = get_pairs_from_list(sub_names)
@@ -71,17 +118,13 @@ st = datetime.now()
 all_route = pd.DataFrame()
 start2 = 0
 index_st = int(input("index 부터 계산시작: "))
-reverse = bool(input("reverse?: "))
 start_st = sub_pairs[index_st][0]
 ii = index_st
 
 for pair in sub_pairs[index_st:]:
-	if reverse:
-        start = pair[1]
-        destination = pair[0]
-    else:
-        start = pair[0]
-        destination = pair[1]
+
+    start = pair[0]
+    destination = pair[1]
 
     if start == start_st:
         continue
@@ -92,7 +135,8 @@ for pair in sub_pairs[index_st:]:
             #all_route.to_csv(path + "/svc_data/route_%d_%s.txt" %(ii, start2),
             #                 encoding = 'cp949', sep = '|', index = False)
             file_name = 'route_%d_%s_rev.txt' %(ii, start2)
-            dataframe_to_gcs(bucket_name, save_path + file_name, all_route)
+            upload_blob(bucket_name, save_path + file_name, all_route)
+            #dataframe_to_gcs(bucket_name, save_path + file_name, all_route)
         all_route = pd.DataFrame()
     
     print("%s\t%s\t\t%3.2f\t%s" %(start, destination, round(ii / len(sub_pairs) * 100, 2), str(datetime.now() - st)))
