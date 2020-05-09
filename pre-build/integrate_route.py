@@ -10,6 +10,32 @@ Created on Fri May  1 15:39:06 2020
 import pandas as pd
 import os
 from tqdm import tqdm
+from google.cloud import storage
+
+os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = os.path.dirname(os.path.abspath(os.path.dirname(__file__)))+ '/key/level-district.json'
+
+def list_blob(bucket_name):
+    global credentials
+    """Uploads a file to the bucket."""
+    # bucket_name = "your-bucket-name"
+    # source_file_name = "local/path/to/file"
+    # destination_blob_name = "storage-object-name"
+
+    storage_client = storage.Client()
+    bucket = storage_client.bucket(bucket_name)
+    blobs = list(bucket.list_blobs())
+    #blob = bucket.blob(destination_blob_name)
+
+    #blob.upload_from_filename("tmp", content_type='text/csv')
+
+    # blob.upload_from_filename(source_file_name)
+
+    print(blobs)
+    )
+bucket_name = 'j-first-bucket'
+save_path = 'route/'
+list_blob('bucket_name')
+
 
 os.chdir("/Users/jireh.park/jireh_module/svc_data/route")
 
