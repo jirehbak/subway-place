@@ -30,6 +30,7 @@ def main():
     blobs = list_blob(bucket_name)
     # blobs to dataframe
     data = blobs_to_dataframe(blobs)
+
     # upload data to gcs
     upload_blob(bucket_name, save_path + file_name, data)
 
@@ -69,8 +70,11 @@ def upload_blob(bucket_name, destination_blob_name, df):
     bucket = storage_client.bucket(bucket_name)
     blob = bucket.blob(destination_blob_name)
 
-    df.to_csv("tmp", encoding = 'utf-8', index = False)
-    blob.upload_from_filename("tmp", content_type='text/csv')
+    storage.blob._MAX_MULTIPART_SIZE = 5 * 1024 * 1024  # 5 MB
+    blob.chunk_size = 5 * 1024 * 1024  # Set 5 MB blob size
+
+    df.to_csv("route_all.txt", encoding = 'utf-8', index = False)
+    blob.upload_from_filename("route_all.txt", content_type='text/csv')
 
     # blob.upload_from_filename(source_file_name)
 
